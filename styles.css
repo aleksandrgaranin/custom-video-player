@@ -105,11 +105,11 @@ video {
     display: none;
 }
 
-.video-container.full-screen .close {
+.video-container.full-screen .open {
     display: none;
 }
 
-.video-container:not(.full-screen) .open {
+.video-container:not(.full-screen) .close {
     display: none;
 }
 
@@ -151,4 +151,12 @@ video {
     align-items: center;
     gap: .25rem;
     flex-grow: 1;
+}
+
+.video-container.captions .caption-btn {
+    border-bottom: 3px solid red;
+}
+
+.video-controls-container .controls button.wide-btn {
+    width: 50px;
 }

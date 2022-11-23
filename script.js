@@ -8,6 +8,9 @@ const muteBtn = document.querySelector('.mute-btn')
 const volumeSlider = document.querySelector('.volume-slider')
 const currentTime = document.querySelector(".current-time")
 const totalTime = document.querySelector(".total-time")
+const captionsBtn = document.querySelector(".caption-btn")
+const playbackSpeedBtn = document.querySelector(".speed-btn")
+
 
 
 
@@ -36,12 +39,33 @@ document.addEventListener("keydown", e => {
         case "j":
             skip(-5)
             break
-            case "arrowright":
+        case "arrowright":
         case "r":
             skip(5)
             break
     }
 })
+
+// Playback Speed
+
+playbackSpeedBtn.addEventListener("click", () => {
+    let newPlaybackRate = video.playbackRate + .25
+    if (newPlaybackRate > 2) newPlaybackRate = .25
+    video.playbackRate = newPlaybackRate
+    playbackSpeedBtn.textContent = `${newPlaybackRate}x`
+})
+
+// Captions
+
+const captions = video.textTracks[0]
+captions.mode = "hidden"
+
+captionsBtn.addEventListener('click', () => {
+    const isHidden = captions.mode === "hidden"
+    captions.mode = isHidden ? "showing" : "hidden"
+    videoContainer.classList.toggle('captions', isHidden)
+})
+
 
 // Duration
 video.addEventListener('loadeddata', () => {
