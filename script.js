@@ -10,8 +10,9 @@ const currentTime = document.querySelector(".current-time")
 const totalTime = document.querySelector(".total-time")
 const captionsBtn = document.querySelector(".caption-btn")
 const playbackSpeedBtn = document.querySelector(".speed-btn")
-
-
+const previewImg = document.querySelector(".preview-img")
+const thumbnailImg = document.querySelector(".thumbnail-img")
+const timeLineContainer = document.querySelector(".timeline-container")
 
 
 document.addEventListener("keydown", e => {
@@ -46,6 +47,56 @@ document.addEventListener("keydown", e => {
     }
 })
 
+// TimeLine
+
+timeLineContainer.addEventListener("mousemove", handleTimelineUpdate)
+timeLineContainer.addEventListener("mousedown", toggleScrubbing)
+
+document.addEventListener("mouseup", e => {
+    if (isScrubbing) toggleScrubbing(e)
+})
+
+document.addEventListener("mousemove", e => {
+    if (isScrubbing) handleTimelineUpdate(e)
+})
+
+
+let isScrubbing = false
+let wasPaused
+function toggleScrubbing(e) {
+    const rect = timeLineContainer.getBoundingClientRect()
+    const percent = Math.min(Math.max(0, e.x - rect.x), rect.width) / rect.width
+    console.log(e.buttons)
+    isScrubbing = (e.buttons & 1) === 1
+    videoContainer.classList.toggle("scrubbing", isScrubbing)
+    if (isScrubbing) {
+        wasPaused = video.paused
+        video.pause()
+    } else {
+        video.currentTime = percent * video.duration
+        if (!wasPaused) video.play()
+    }
+
+    handleTimelineUpdate(e)
+}
+
+function handleTimelineUpdate(e) {
+    const rect = timeLineContainer.getBoundingClientRect()
+    const percent = Math.min(Math.max(0, e.x - rect.x), rect.width) / rect.width
+    const previewImgNumber = Math.max(1, Math.floor((percent * video.duration) / 10))
+    const previewImgSrc = `assets/previewImgs/preview${previewImgNumber}.jpg`
+    previewImg.src = previewImgSrc
+    console.log(previewImgSrc)
+    timeLineContainer.style.setProperty("--preview-position", percent)
+
+    if (isScrubbing) {
+        e.preventDefault()
+        thumbnailImg.src = previewImgSrc
+        timeLineContainer.style.setProperty("--progress-position", percent)
+    }
+}
+
+
 // Playback Speed
 
 playbackSpeedBtn.addEventListener("click", () => {
@@ -74,6 +125,8 @@ video.addEventListener('loadeddata', () => {
 
 video.addEventListener("timeupdate", () => {
     currentTime.textContent = formatDuration(video.currentTime)
+    const percent = video.currentTime / video.duration
+    timeLineContainer.style.setProperty("--progress-position", percent)
 })
 
 const leadingZeroFormatter = new Intl.NumberFormat(undefined, {
